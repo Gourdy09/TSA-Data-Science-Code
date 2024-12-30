@@ -357,7 +357,7 @@ print("Coefficient of Determination(R^2): ", r_squared)
 max_corr_lag, max_corr = graph_lag(
     csv_file1="data_files/gdp/gdp_data.csv",
     csv_file2="data_files/hpi/hpi_data.csv",
-    title="Lag Between CPI and HPI"
+    title="Lag Between GDP and HPI"
 )
 print("Max Lag Correlation: ", max_corr_lag)
 print("Max Correlation", max_corr)
@@ -371,10 +371,10 @@ graph(
     x_label_rotation=45,  # Rotate x-axis labels by 45 degrees
     y_label_rotation=0,  # No rotation for y-axis labels
     y_tick_interval=50,  # Y-ticks every 50 units
-    graph_title="S&P500 Vs. HPI",  # Title of the graph
+    graph_title="Gold Prices Vs. HPI",  # Title of the graph
     x_axis_label="Date",  # Label for x-axis
     y_axis_label="Value",  # Label for y-axis
-    line1_name="S&P500",
+    line1_name="Gold Prices",
     line2_name="HPI"
 )
 r, r_squared = calculate_correlation(
@@ -396,7 +396,49 @@ print("Coefficient of Determination(R^2): ", r_squared)
 max_corr_lag, max_corr = graph_lag(
     csv_file1="data_files/sp500/sp500_data.csv",
     csv_file2="data_files/hpi/hpi_data.csv",
-    title="Lag Between CPI and HPI"
+    title="Lag Between S&P500 and HPI"
+)
+print("Max Lag Correlation: ", max_corr_lag)
+print("Max Correlation", max_corr)
+
+
+# Gold and HPI #
+print("\n---------------- Gold and HPI ----------------")
+graph(
+    file1="data_files/gold/gold_data.csv",
+    file2="data_files/hpi/hpi_data.csv",
+    subsample_rate=10,  # Subsample every 10th value
+    x_label_rotation=45,  # Rotate x-axis labels by 45 degrees
+    y_label_rotation=0,  # No rotation for y-axis labels
+    y_tick_interval=50,  # Y-ticks every 50 units
+    graph_title="Gold Prices Vs. HPI",  # Title of the graph
+    x_axis_label="Date",  # Label for x-axis
+    y_axis_label="Value",  # Label for y-axis
+    line1_name="Gold Prices",
+    line2_name="HPI",
+)
+r, r_squared = calculate_correlation(
+    file1="data_files/gold/gold_data.csv",
+    file2="data_files/hpi/hpi_data.csv",
+    column1="Date",
+    column2="Value",
+    x_axis_label="Date",
+    CPI=True
+)
+slope, y_intercept = calculate_line(
+    file1="data_files/gold/gold_data.csv",
+    file2="data_files/hpi/hpi_data.csv",
+    x_axis_label="Date",
+    CPI=True
+)
+print("Slope:", slope)
+print("Y-Intercept:", y_intercept)
+print("Correlation(r): ", r)
+print("Coefficient of Determination(R^2): ", r_squared)
+max_corr_lag, max_corr = graph_lag(
+    csv_file1="data_files/gold/gold_data.csv",
+    csv_file2="data_files/hpi/hpi_data.csv",
+    title="Lag Between Gold Prices and HPI"
 )
 print("Max Lag Correlation: ", max_corr_lag)
 print("Max Correlation", max_corr)
