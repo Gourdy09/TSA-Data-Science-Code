@@ -109,16 +109,13 @@ def calculate_correlation(file1: str, file2: str, column1: str, column2: str, x_
     column1 (str): The name of the column in the first CSV file to correlate.
     column2 (str): The name of the column in the second CSV file to correlate.
     x_axis_label (str): The name of the column containing the date or time values, used as the common key for merging.
-    CPI (bool): If True, merge based on year; if False, merge based on exact date.
+    CPI (bool): If True, replicate CPI value across the year for each day; if False, merge based on exact date.
 
     Returns:
     tuple: A tuple containing the Pearson correlation and its squared value (R^2).
         - correlation (float): The Pearson correlation coefficient between the two specified columns.
         - correlation_squared (float): The square of the correlation coefficient (R^2), indicating the proportion 
           of variance in one variable explained by the other.
-    
-    The function assumes that both datasets share the same date format ('%m/%d/%Y') and will only keep rows 
-    with matching date values from both CSV files.
     """
 
     # Read the CSV files into DataFrames
@@ -133,16 +130,18 @@ def calculate_correlation(file1: str, file2: str, column1: str, column2: str, x_
     df1[x_axis_label] = pd.to_datetime(df1[x_axis_label], format='%m/%d/%Y')
     df2[x_axis_label] = pd.to_datetime(df2[x_axis_label], format='%m/%d/%Y')
 
-    # If CPI is True, extract the year from the date column
     if CPI:
+        # Extract the year from the date column for both datasets
         df1['Year'] = df1[x_axis_label].dt.year
         df2['Year'] = df2[x_axis_label].dt.year
-        # Merge on the Year column, taking the average for each year
-        df1 = df1.groupby('Year').agg({column1: 'mean'}).reset_index()
-        df2 = df2.groupby('Year').agg({column2: 'mean'}).reset_index()
-        df_merged = pd.merge(df1, df2, on='Year', how='inner')
+        
+        # For CPI data, replicate the CPI value across all days of the same year
+        df1['CPI'] = df1['Value']
+        
+        # Merge datasets on the year
+        df_merged = pd.merge(df2, df1[['Year', 'CPI']], on='Year', how='left')
     else:
-        # Merge both DataFrames on the exact date
+        # Merge both DataFrames on the exact date if CPI is False
         df_merged = pd.merge(df1, df2, on=x_axis_label, how='inner')
 
     # Calculate the correlation between the two specified columns
@@ -152,6 +151,7 @@ def calculate_correlation(file1: str, file2: str, column1: str, column2: str, x_
     correlation_squared = correlation ** 2
 
     return correlation, correlation_squared
+
 
 
 def calculate_line(file1: str, file2: str, x_axis_label: str, CPI=False):
@@ -371,10 +371,10 @@ graph(
     x_label_rotation=45,  # Rotate x-axis labels by 45 degrees
     y_label_rotation=0,  # No rotation for y-axis labels
     y_tick_interval=50,  # Y-ticks every 50 units
-    graph_title="Gold Prices Vs. HPI",  # Title of the graph
+    graph_title="S&P500 Vs. HPI",  # Title of the graph
     x_axis_label="Date",  # Label for x-axis
     y_axis_label="Value",  # Label for y-axis
-    line1_name="Gold Prices",
+    line1_name="S&P500 Value",
     line2_name="HPI"
 )
 r, r_squared = calculate_correlation(
